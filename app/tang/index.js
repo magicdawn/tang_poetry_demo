@@ -35,23 +35,40 @@ router.get('/tang/poets', function*() {
 
 // 写诗最多的湿人
 router.get('/tang/top_poets', function*() {
-
   const sql = `
-  -- select poets.name, t.poetry_count, t.poetry_ids, t.poet_ids
-  -- from
-  -- (
-    SELECT poet_id, COUNT(poet_id) as poetry_count, GROUP_CONCAT(id) as poetry_ids, GROUP_CONCAT(poet_id) as poet_ids
+  select poets.name, t.poetry_count, t.poetry_ids
+  from
+  (
+    SELECT poet_id, COUNT(poet_id) as poetry_count, GROUP_CONCAT(id) as poetry_ids
     FROM poetries
     GROUP BY poet_id
     ORDER BY count(poet_id) DESC
     LIMIT ?,?
-  -- ) as t
-  -- left join poets
-  -- on t.poet_id = poets.id
+  ) as t
+  left join poets
+  on t.poet_id = poets.id
   `;
 
   const start = Number(this.query.start || 0);
   const count = Number(this.query.count || 10);
   console.log(start, count);
   this.body = yield query(sql, [start, count]);
+});
+
+// 为你写诗
+router.get('/tang/poetry/:id', function*() {
+  const sql = `
+  select *
+  from
+  (
+    select *
+    from poetries
+    where id = ?
+  ) as t
+  left join poets
+  on poets.id = t.poet_id
+  `;
+
+  const id = this.params.id;
+  this.body = yield query(sql, [id]);
 });

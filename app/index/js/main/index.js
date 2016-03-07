@@ -1,5 +1,6 @@
 'use strict';
-/* eslint no-var: 0 */ // eslint ES6 var const
+/* eslint no-var: 0 */
+/* eslint-env browser */
 
 var $ = require('jquery');
 
